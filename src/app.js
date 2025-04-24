@@ -1,11 +1,22 @@
-import express from 'express';
+import express from "express"
+import { config } from "dotenv"
+import { connectDB } from "./db/index.js"
+import adminRoutes from './routes/admin.routes.js'
+
+
+config();
 
 const app = express();
+const PORT = +process.env.PORT;
 
-app.get('/', (req, res) => {
-    res.send('Hello World!');
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
+await connectDB()
+
+app.use('/admin' ,adminRoutes)
+
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
 
-app.listen(3000, () => {
-    console.log('Server is running on http://localhost:3000');
-});
