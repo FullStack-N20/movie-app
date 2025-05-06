@@ -3,10 +3,10 @@ import { JsonWebTokenError } from 'jsonwebtoken';
 import { MongoError } from 'mongodb';
 import logger from '../utils/logger.js';
 
-const errorHandler = (err, req, res, next) => {
+const errorHandler = (err, req, res) => {
   const timestamp = new Date().toISOString();
   const requestId = req.id || 'unknown';
-  
+
   let statusCode = 500;
   let message = 'Internal Server Error';
   let errorDetails = {};
@@ -14,9 +14,9 @@ const errorHandler = (err, req, res, next) => {
   if (err instanceof ValidationError) {
     statusCode = 400;
     message = 'Validation Error';
-    errorDetails = err.details.map(detail => ({
+    errorDetails = err.details.map((detail) => ({
       field: detail.path.join('.'),
-      message: detail.message
+      message: detail.message,
     }));
   } else if (err instanceof JsonWebTokenError) {
     statusCode = 401;
@@ -41,7 +41,7 @@ const errorHandler = (err, req, res, next) => {
     message,
     error: process.env.NODE_ENV === 'development' ? err.stack : undefined,
     userAgent: req.get('user-agent'),
-    ip: req.ip
+    ip: req.ip,
   };
 
   logger.error(logData);
@@ -52,7 +52,7 @@ const errorHandler = (err, req, res, next) => {
     ...(errorDetails && { errors: errorDetails }),
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
     statusCode,
-    requestId
+    requestId,
   });
 };
 

@@ -8,7 +8,7 @@ export const JwtAuthGuard = (req, res, next) => {
       return res.status(401).json({
         status: 'error',
         message: 'No authorization header provided',
-        statusCode: 401
+        statusCode: 401,
       });
     }
 
@@ -16,7 +16,7 @@ export const JwtAuthGuard = (req, res, next) => {
       return res.status(401).json({
         status: 'error',
         message: 'Invalid authorization header format',
-        statusCode: 401
+        statusCode: 401,
       });
     }
 
@@ -26,17 +26,17 @@ export const JwtAuthGuard = (req, res, next) => {
       return res.status(401).json({
         status: 'error',
         message: 'No token provided',
-        statusCode: 401
+        statusCode: 401,
       });
     }
 
     const decodedData = jwt.verify(token, process.env.ACCESS_TOKEN_KEY);
-    
+
     if (!decodedData || !decodedData.userId) {
       return res.status(401).json({
         status: 'error',
         message: 'Invalid token payload',
-        statusCode: 401
+        statusCode: 401,
       });
     }
 
@@ -47,7 +47,7 @@ export const JwtAuthGuard = (req, res, next) => {
       return res.status(401).json({
         status: 'error',
         message: 'Token has expired',
-        statusCode: 401
+        statusCode: 401,
       });
     }
 
@@ -55,14 +55,14 @@ export const JwtAuthGuard = (req, res, next) => {
       return res.status(401).json({
         status: 'error',
         message: 'Invalid token',
-        statusCode: 401
+        statusCode: 401,
       });
     }
 
     return res.status(500).json({
       status: 'error',
       message: 'Internal server error',
-      error: error.message
+      error: error.message,
     });
   }
 };

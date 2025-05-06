@@ -4,7 +4,9 @@ import { createError } from '../utils/error-response.js';
 const jwtAuth = (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
-    const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
+    const token = authHeader?.startsWith('Bearer ')
+      ? authHeader.split(' ')[1]
+      : null;
 
     if (!token) {
       throw createError(401, 'Authentication required');
@@ -13,7 +15,7 @@ const jwtAuth = (req, res, next) => {
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_KEY, {
       algorithms: ['HS256'],
       issuer: process.env.JWT_ISSUER,
-      maxAge: process.env.JWT_EXPIRES_IN
+      maxAge: process.env.JWT_EXPIRES_IN,
     });
 
     if (!decoded.userId || !decoded.role) {
@@ -23,7 +25,7 @@ const jwtAuth = (req, res, next) => {
     req.user = {
       userId: decoded.userId,
       role: decoded.role,
-      email: decoded.email
+      email: decoded.email,
     };
 
     next();

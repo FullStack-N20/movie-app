@@ -7,17 +7,9 @@ import { movieValidation } from '../utils/movie-validation.js';
 const router = Router();
 const controller = new MovieController();
 
-router.get(
-  '/',
-  validate(movieValidation.list),
-  controller.list
-);
+router.get('/', validate(movieValidation.list), controller.list);
 
-router.get(
-  '/:id',
-  validate(movieValidation.detail),
-  controller.detail
-);
+router.get('/:id', validate(movieValidation.detail), controller.detail);
 
 router.post(
   '/',

@@ -7,11 +7,7 @@ import { reviewValidation } from '../utils/review-validation.js';
 const router = Router();
 const controller = new ReviewController();
 
-router.get(
-  '/',
-  validate(reviewValidation.list),
-  controller.list
-);
+router.get('/', validate(reviewValidation.list), controller.list);
 
 router.post(
   '/',

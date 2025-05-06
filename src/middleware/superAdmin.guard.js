@@ -1,5 +1,3 @@
-import { catchError } from '../utils/error-response.js';
-
 export const SuperAdminGuard = (req, res, next) => {
   try {
     const { user } = req;
@@ -8,7 +6,7 @@ export const SuperAdminGuard = (req, res, next) => {
       return res.status(401).json({
         status: 'error',
         message: 'Authentication required',
-        statusCode: 401
+        statusCode: 401,
       });
     }
 
@@ -16,7 +14,7 @@ export const SuperAdminGuard = (req, res, next) => {
       return res.status(403).json({
         status: 'error',
         message: 'Access denied. SuperAdmin privileges required',
-        statusCode: 403
+        statusCode: 403,
       });
     }
 
@@ -25,7 +23,7 @@ export const SuperAdminGuard = (req, res, next) => {
     return res.status(500).json({
       status: 'error',
       message: 'Internal server error',
-      error: error.message
+      error: error.message,
     });
   }
 };

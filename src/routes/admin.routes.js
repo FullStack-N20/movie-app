@@ -23,19 +23,9 @@ router.post(
   controller.createSuperAdmin
 );
 
-router.get(
-  '/',
-  JwtAuthGuard,
-  SuperAdminGuard,
-  controller.getAllAdmins
-);
+router.get('/', JwtAuthGuard, SuperAdminGuard, controller.getAllAdmins);
 
-router.get(
-  '/:id',
-  JwtAuthGuard,
-  SelfGuard,
-  controller.getAdminByID
-);
+router.get('/:id', JwtAuthGuard, SelfGuard, controller.getAdminByID);
 
 router.patch(
   '/:id',
@@ -45,17 +35,8 @@ router.patch(
   controller.updateAdmin
 );
 
-router.delete(
-  '/:id',
-  JwtAuthGuard,
-  SuperAdminGuard,
-  controller.deleteAdmin
-);
+router.delete('/:id', JwtAuthGuard, SuperAdminGuard, controller.deleteAdmin);
 
-router.post(
-  '/signIn',
-  validate(adminValidation.signIn),
-  controller.signIn
-);
+router.post('/signIn', validate(adminValidation.signIn), controller.signIn);
 
 export default router;

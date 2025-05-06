@@ -208,12 +208,18 @@ export class AuthController {
       const accessToken = generateAccessToken(payload);
       const refreshToken = generateRefreshToken(payload);
 
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+        maxAge: 30 * 24 * 60 * 60 * 1000 
+      });
+
       return res.status(200).json({
         status: 'success',
         message: 'Login successful',
         data: {
           accessToken,
-          refreshToken,
           user: {
             id: user._id,
             name: user.name,

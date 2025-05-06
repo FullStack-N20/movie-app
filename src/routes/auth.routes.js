@@ -18,11 +18,7 @@ router.post(
   controller.verifyRegisterOTP
 );
 
-router.post(
-  '/login',
-  validate(authValidation.login),
-  controller.login
-);
+router.post('/login', validate(authValidation.login), controller.login);
 
 router.post(
   '/verify-login-otp',
