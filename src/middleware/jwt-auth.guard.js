@@ -1,37 +1,68 @@
 import jwt from 'jsonwebtoken';
-import { catchError } from '../utils/error-response.js';
 
 export const JwtAuthGuard = (req, res, next) => {
   try {
-    const auth = req.headers?.authorization;
+    const authHeader = req.headers.authorization;
 
-    if (!auth || !auth.startsWith('Bearer ')) {
+    if (!authHeader) {
       return res.status(401).json({
-        statusCode: 401,
-        message: 'Authorization error',
+        status: 'error',
+        message: 'No authorization header provided',
+        statusCode: 401
       });
     }
-    console.log(1111);
 
-    const token = auth.split(' ')[1];
+    if (!authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({
+        status: 'error',
+        message: 'Invalid authorization header format',
+        statusCode: 401
+      });
+    }
+
+    const token = authHeader.split(' ')[1];
+
     if (!token) {
       return res.status(401).json({
-        statusCode: 401,
-        message: 'Token not found',
+        status: 'error',
+        message: 'No token provided',
+        statusCode: 401
       });
     }
 
     const decodedData = jwt.verify(token, process.env.ACCESS_TOKEN_KEY);
-    if (!decodedData) {
+    
+    if (!decodedData || !decodedData.userId) {
       return res.status(401).json({
-        statusCode: 401,
-        message: 'Token expire',
+        status: 'error',
+        message: 'Invalid token payload',
+        statusCode: 401
       });
     }
 
     req.user = decodedData;
     next();
-  } catch (e) {
-    catchError(e, res);
+  } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) {
+      return res.status(401).json({
+        status: 'error',
+        message: 'Token has expired',
+        statusCode: 401
+      });
+    }
+
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(401).json({
+        status: 'error',
+        message: 'Invalid token',
+        statusCode: 401
+      });
+    }
+
+    return res.status(500).json({
+      status: 'error',
+      message: 'Internal server error',
+      error: error.message
+    });
   }
 };

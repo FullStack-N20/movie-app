@@ -1,28 +1,37 @@
 import { Router } from 'express';
 import { ReviewController } from '../controllers/review.controller.js';
-import jwtAuth from '../middleware/jwt-auth.js';
+import { JwtAuthGuard } from '../middleware/jwt-auth.guard.js';
 import validate from '../middleware/validate.js';
-import {
-  createReviewSchema,
-  updateReviewSchema,
-} from '../utils/validation/review.js';
+import { reviewValidation } from '../utils/review-validation.js';
 
 const router = Router();
-const controller = new ReviewController()
+const controller = new ReviewController();
 
-router.get('/', controller.list);
+router.get(
+  '/',
+  validate(reviewValidation.list),
+  controller.list
+);
+
 router.post(
   '/',
-  jwtAuth,
-  validate(createReviewSchema),
+  JwtAuthGuard,
+  validate(reviewValidation.create),
   controller.create
 );
-router.put(
+
+router.patch(
   '/:id',
-  jwtAuth,
-  validate(updateReviewSchema),
+  JwtAuthGuard,
+  validate(reviewValidation.update),
   controller.update
 );
-router.delete('/:id', jwtAuth, controller.remove);
+
+router.delete(
+  '/:id',
+  JwtAuthGuard,
+  validate(reviewValidation.remove),
+  controller.remove
+);
 
 export default router;

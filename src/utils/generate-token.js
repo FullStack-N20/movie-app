@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { config } from 'dotenv';
 
-config()
+config();
 
 export const generateAccessToken = (payload) => {
   return jwt.sign(payload, process.env.ACCESS_TOKEN_KEY, {

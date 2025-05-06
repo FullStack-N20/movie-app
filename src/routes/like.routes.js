@@ -1,13 +1,24 @@
 import { Router } from 'express';
 import { LikeController } from '../controllers/like.controller.js';
-import jwtAuth from '../middleware/jwt-auth.js';
+import { JwtAuthGuard } from '../middleware/jwt-auth.guard.js';
 import validate from '../middleware/validate.js';
-import { likeSchema } from '../utils/validation/like.js';
+import { likeValidation } from '../utils/like-validation.js';
 
 const router = Router();
-const controller = new LikeController()
+const controller = new LikeController();
 
-router.post('/', jwtAuth, validate(likeSchema), controller.like);
-router.delete('/', jwtAuth, validate(likeSchema), controller.unlike);
+router.post(
+  '/',
+  JwtAuthGuard,
+  validate(likeValidation.like),
+  controller.like
+);
+
+router.delete(
+  '/',
+  JwtAuthGuard,
+  validate(likeValidation.unlike),
+  controller.unlike
+);
 
 export default router;

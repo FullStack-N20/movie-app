@@ -1,18 +1,42 @@
 import jwt from 'jsonwebtoken';
-import { catchError } from '../utils/error-response.js';
+import { createError } from '../utils/error-response.js';
 
 const jwtAuth = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'No token provided' });
-  }
-  const token = authHeader.split(' ')[1];
   try {
-    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_KEY);
-    req.user = decoded;
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
+
+    if (!token) {
+      throw createError(401, 'Authentication required');
+    }
+
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_KEY, {
+      algorithms: ['HS256'],
+      issuer: process.env.JWT_ISSUER,
+      maxAge: process.env.JWT_EXPIRES_IN
+    });
+
+    if (!decoded.userId || !decoded.role) {
+      throw createError(401, 'Invalid token payload');
+    }
+
+    req.user = {
+      userId: decoded.userId,
+      role: decoded.role,
+      email: decoded.email
+    };
+
     next();
-  } catch (err) {
-      catchError(res, 500, err.message);
+  } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) {
+      throw createError(401, 'Token expired');
+    }
+
+    if (error instanceof jwt.JsonWebTokenError) {
+      throw createError(401, 'Invalid token');
+    }
+
+    throw error;
   }
 };
 

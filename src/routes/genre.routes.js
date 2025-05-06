@@ -1,14 +1,26 @@
 import { Router } from 'express';
 import { GenreController } from '../controllers/genre.controller.js';
-import jwtAuth from '../middleware/jwt-auth.js';
+import { JwtAuthGuard } from '../middleware/jwt-auth.guard.js';
 import validate from '../middleware/validate.js';
-import { createGenreSchema } from '../utils/validation/genre.js';
+import { genreValidation } from '../utils/genre-validation.js';
 
 const router = Router();
-const controller = new GenreController()
+const controller = new GenreController();
 
 router.get('/', controller.list);
-router.post('/', jwtAuth, validate(createGenreSchema), controller.create);
-router.delete('/:id', jwtAuth, controller.remove);
+
+router.post(
+  '/',
+  JwtAuthGuard,
+  validate(genreValidation.create),
+  controller.create
+);
+
+router.delete(
+  '/:id',
+  JwtAuthGuard,
+  validate(genreValidation.remove),
+  controller.remove
+);
 
 export default router;
