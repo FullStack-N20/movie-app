@@ -1,11 +1,17 @@
+import mongoose from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
 
-import { model , Schema} from 'mongoose'
+const userSchema = new mongoose.Schema(
+  {
+    id: { type: String, default: uuidv4, unique: true },
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password_hash: { type: String, required: true },
+    otp: { type: String },
+    otp_expiry: { type: Date },
+    is_verified: { type: Boolean, default: false },
+  },
+  { timestamps: { createdAt: 'created_at', updatedAt: false } }
+);
 
-const userSchema = new Schema({
-    username: {type: String, required: true},
-    email: {type: String, unique: true, required: true},
-    hashedPassword: {type: String, required: true}
-}, {timestamps: true});
-
-const User = model('User', userSchema);
-export default User;
+export default mongoose.model('User', userSchema);
