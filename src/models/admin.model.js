@@ -69,54 +69,9 @@ const adminSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: {
-      createdAt: 'created_at',
-      updatedAt: 'updated_at',
-    },
-    toJSON: {
-      transform: (_, ret) => {
-        delete ret.password_hash;
-        delete ret.failed_login_attempts;
-        delete ret.lock_until;
-        return ret;
-      },
-    },
-  }
+    timestamps: true,
+  },
 );
 
-adminSchema.index({ email: 1 });
-adminSchema.index({ username: 1 });
-adminSchema.index({ created_at: -1 });
-
-adminSchema.methods.comparePassword = async function (candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password_hash);
-};
-
-adminSchema.methods.updateLastLogin = async function () {
-  this.last_login = new Date();
-  this.failed_login_attempts = 0;
-  this.lock_until = undefined;
-  return this.save();
-};
-
-adminSchema.methods.incrementFailedLoginAttempts = async function () {
-  this.failed_login_attempts += 1;
-  if (this.failed_login_attempts >= 5) {
-    this.lock_until = new Date(Date.now() + 30 * 60 * 1000); // Lock for 30 minutes
-  }
-  return this.save();
-};
-
-adminSchema.pre('save', async function (next) {
-  if (!this.isModified('password_hash')) return next();
-
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password_hash = await bcrypt.hash(this.password_hash, salt);
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
 
 export default mongoose.model('Admin', adminSchema);

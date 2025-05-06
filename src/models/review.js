@@ -50,52 +50,8 @@ const reviewSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: {
-      createdAt: 'created_at',
-      updatedAt: 'updated_at',
-    },
-    toJSON: {
-      virtuals: true,
-      transform: (_, ret) => {
-        ret.id = ret._id;
-        delete ret._id;
-        delete ret.__v;
-        return ret;
-      },
-    },
-  }
+    timestamps: true,
+  },
 );
-
-reviewSchema.index({ created_at: -1 });
-reviewSchema.index({ rating: -1 });
-reviewSchema.index({ likes: -1 });
-
-reviewSchema.virtual('helpful_score').get(function () {
-  return this.helpful_votes.up - this.helpful_votes.down;
-});
-
-reviewSchema.methods.markHelpful = async function (vote) {
-  if (vote === 'up') {
-    this.helpful_votes.up += 1;
-  } else if (vote === 'down') {
-    this.helpful_votes.down += 1;
-  }
-  return this.save();
-};
-
-reviewSchema.pre('save', async function (next) {
-  if (this.isModified('rating')) {
-    const Movie = mongoose.model('Movie');
-    await Movie.findByIdAndUpdate(this.movie, {
-      $inc: { rating: this.rating },
-    });
-  }
-  next();
-});
-
-reviewSchema.post('remove', async function () {
-  const Movie = mongoose.model('Movie');
-  await Movie.findByIdAndUpdate(this.movie, { $inc: { rating: -this.rating } });
-});
 
 export default mongoose.model('Review', reviewSchema);

@@ -52,43 +52,8 @@ const userSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: {
-      createdAt: 'created_at',
-      updatedAt: 'updated_at',
-    },
-    toJSON: {
-      transform: (_, ret) => {
-        delete ret.password_hash;
-        delete ret.otp;
-        delete ret.otp_expiry;
-        return ret;
-      },
-    },
-  }
+    timestamps: true,
+  },
 );
-
-userSchema.index({ email: 1 });
-userSchema.index({ created_at: -1 });
-
-userSchema.methods.comparePassword = async function (candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password_hash);
-};
-
-userSchema.methods.updateLastLogin = async function () {
-  this.last_login = new Date();
-  return this.save();
-};
-
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password_hash')) return next();
-
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password_hash = await bcrypt.hash(this.password_hash, salt);
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
 
 export default mongoose.model('User', userSchema);

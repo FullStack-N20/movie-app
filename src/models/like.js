@@ -33,46 +33,8 @@ const likeSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: {
-      createdAt: 'created_at',
-      updatedAt: 'updated_at',
-    },
-    toJSON: {
-      virtuals: true,
-      transform: (_, ret) => {
-        ret.id = ret._id;
-        delete ret._id;
-        delete ret.__v;
-        return ret;
-      },
-    },
-  }
+    timestamps: true,
+  },
 );
-
-likeSchema.index({ review: 1, user: 1 }, { unique: true });
-likeSchema.index({ created_at: -1 });
-
-likeSchema.pre('save', async function (next) {
-  if (this.isNew) {
-    const Review = mongoose.model('Review');
-    await Review.findByIdAndUpdate(this.review, { $inc: { likes: 1 } });
-  }
-  next();
-});
-
-likeSchema.pre('remove', async function () {
-  const Review = mongoose.model('Review');
-  await Review.findByIdAndUpdate(this.review, { $inc: { likes: -1 } });
-});
-
-likeSchema.methods.toggle = async function () {
-  this.type = this.type === 'like' ? 'dislike' : 'like';
-  return this.save();
-};
-
-likeSchema.methods.remove = async function () {
-  this.status = 'removed';
-  return this.save();
-};
 
 export default mongoose.model('Like', likeSchema);

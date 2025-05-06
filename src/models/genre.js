@@ -39,55 +39,10 @@ const genreSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: {
-      createdAt: 'created_at',
-      updatedAt: 'updated_at',
-    },
-    toJSON: {
-      virtuals: true,
-      transform: (_, ret) => {
-        ret.id = ret._id;
-        delete ret._id;
-        delete ret.__v;
-        return ret;
-      },
-    },
-  }
+    timestamps: true,
+  },
 );
 
-genreSchema.index({ name: 'text' });
-genreSchema.index({ slug: 1 });
-genreSchema.index({ created_at: -1 });
 
-genreSchema.virtual('movies', {
-  ref: 'Movie',
-  localField: '_id',
-  foreignField: 'genres',
-});
-
-genreSchema.virtual('subgenres', {
-  ref: 'Genre',
-  localField: '_id',
-  foreignField: 'parent',
-});
-
-genreSchema.pre('save', function (next) {
-  if (this.isModified('name')) {
-    this.slug = this.name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '');
-  }
-  next();
-});
-
-genreSchema.methods.getMovieCount = async function () {
-  const Movie = mongoose.model('Movie');
-  return Movie.countDocuments({ genres: this._id });
-};
-
-genreSchema.methods.getSubgenreCount = async function () {
-  return mongoose.model('Genre').countDocuments({ parent: this._id });
-};
 
 export default mongoose.model('Genre', genreSchema);

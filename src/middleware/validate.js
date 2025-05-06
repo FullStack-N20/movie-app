@@ -1,4 +1,4 @@
-import { createError } from '../utils/error-response.js';
+import { catchError } from '../utils/error-response.js';
 import logger from '../utils/logger.js';
 
 const validate =
@@ -25,7 +25,7 @@ const validate =
           errors,
         });
 
-        throw createError(400, 'Validation failed', { errors });
+        throw catchError(400, 'Validation failed', { errors });
       }
 
       req.validatedData = value;

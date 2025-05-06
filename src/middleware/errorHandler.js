@@ -1,5 +1,5 @@
-import { ValidationError } from 'joi';
-import { JsonWebTokenError } from 'jsonwebtoken';
+import joi from 'joi';
+import jwt from 'jsonwebtoken';
 import { MongoError } from 'mongodb';
 import logger from '../utils/logger.js';
 
@@ -11,14 +11,14 @@ const errorHandler = (err, req, res) => {
   let message = 'Internal Server Error';
   let errorDetails = {};
 
-  if (err instanceof ValidationError) {
+  if (err instanceof joi.ValidationError) {
     statusCode = 400;
     message = 'Validation Error';
     errorDetails = err.details.map((detail) => ({
       field: detail.path.join('.'),
       message: detail.message,
     }));
-  } else if (err instanceof JsonWebTokenError) {
+  } else if (err instanceof jwt.JsonWebTokenError) {
     statusCode = 401;
     message = 'Invalid Token';
   } else if (err instanceof MongoError) {

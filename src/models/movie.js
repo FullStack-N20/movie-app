@@ -70,46 +70,8 @@ const movieSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: {
-      createdAt: 'created_at',
-      updatedAt: 'updated_at',
-    },
-    toJSON: {
-      virtuals: true,
-      transform: (_, ret) => {
-        ret.id = ret._id;
-        delete ret._id;
-        delete ret.__v;
-        return ret;
-      },
-    },
-  }
+    timestamps: true,
+  },
 );
-
-movieSchema.index({ title: 'text', description: 'text' });
-movieSchema.index({ release_year: -1 });
-movieSchema.index({ rating: -1 });
-movieSchema.index({ created_at: -1 });
-
-movieSchema.virtual('reviews', {
-  ref: 'Review',
-  localField: '_id',
-  foreignField: 'movie',
-});
-
-movieSchema.virtual('likes', {
-  ref: 'Like',
-  localField: '_id',
-  foreignField: 'movie',
-});
-
-movieSchema.methods.updateRating = async function () {
-  const reviews = await mongoose.model('Review').find({ movie: this._id });
-  if (reviews.length === 0) return;
-
-  const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
-  this.rating = totalRating / reviews.length;
-  return this.save();
-};
 
 export default mongoose.model('Movie', movieSchema);

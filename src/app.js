@@ -12,7 +12,7 @@ import genreRoutes from './routes/genre.routes.js';
 import reviewRoutes from './routes/review.routes.js';
 import likeRoutes from './routes/like.routes.js';
 import errorHandler from './middleware/errorHandler.js';
-import { createError } from './utils/error-response.js';
+import { catchError } from './utils/error-response.js';
 import rateLimit from 'express-rate-limit';
 import logger from './utils/logger.js';
 
@@ -75,7 +75,7 @@ app.get('/health', (req, res) => {
 });
 
 app.use((req, res, next) => {
-  next(createError(404, `Route ${req.originalUrl} not found`));
+  next(catchError(404, `Route ${req.originalUrl} not found`));
 });
 
 app.use(errorHandler);
